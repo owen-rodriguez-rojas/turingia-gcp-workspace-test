@@ -10,7 +10,7 @@ en Google Workspace — Periodo de prueba técnica Turing IA.
 ## Configuración del proyecto
 
 ### 1. Proyecto GCP
-Se creó el proyecto `turing-gcp-prueba` en Google Cloud Platform.
+Se creó el proyecto `turing-gcp-test` en Google Cloud Platform.
 
 ![Proyecto creado](docs/capturas/01-proyecto-creado.png)
 
@@ -64,7 +64,7 @@ campos faltantes y manejo de errores.
 ![Pruebas unitarias](docs/capturas/11-pruebas-unitarias.png)
 
 ## Estructura del repositorio
-\```
+```
 turing-gcp-workspace-prueba/
 ├── README.md
 ├── cloud-function/
@@ -73,4 +73,4 @@ turing-gcp-workspace-prueba/
 │   └── test_main.py
 └── docs/
     └── capturas/
-\```
+```
