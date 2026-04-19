@@ -69,7 +69,77 @@ campos faltantes y manejo de errores.
 
 ## DÍA 2 — Automatización en Google Workspace
 
-*(En construcción — se actualizará al completar el Día 2)*
+### 1. Simulación del entorno de Google Workspace
+
+Se simuló un entorno de Google Workspace mediante Google Groups,
+configurando grupos de usuarios, asignación de roles y políticas
+básicas de seguridad y permisos.
+
+#### Google Groups
+![Google Groups inicio](docs/capturas/Dia2/01-google-groups-inicio.png)
+![Grupo creado](docs/capturas/Dia2/02-google-group-creado.png)
+![Miembros y roles](docs/capturas/Dia2/03-google-group-miembros.png)
+
+### 2. Google Sheet — Sistema de Gestión de Tareas
+
+Se creó un Google Sheet con estructura de datos para gestionar tareas
+del equipo, incluyendo responsable, email, fecha límite, estado,
+días restantes y control de eventos y alertas.
+
+![Estructura del Sheet](docs/capturas/Dia2/05-sheet-estructura.png)
+
+### 3. Google Apps Script
+
+Se desarrolló un script avanzado en Google Apps Script que integra
+tres servicios de Google Workspace de forma automática:
+
+- **Google Sheets** — Lee datos, calcula días restantes y actualiza registros
+- **Gmail** — Envía alertas cuando una tarea está próxima a vencer
+- **Google Calendar** — Crea eventos automáticamente en la fecha límite de cada tarea
+
+El script incluye control de alertas duplicadas mediante la columna
+`Alerta_Enviada`, garantizando que cada tarea reciba solo una notificación.
+
+![Editor de Apps Script](docs/capturas/Dia2/06-apps-script-editor.png)
+![Código del script](docs/capturas/Dia2/07-apps-script-codigo.png)
+![Ejecución exitosa](docs/capturas/Dia2/08-apps-script-ejecucion.png)
+
+### 4. Triggers configurados
+
+Se configuraron dos activadores automáticos:
+
+- **Trigger diario** — Ejecuta el script todos los días entre 9:00 y 10:00 am
+- **Trigger por edición** — Ejecuta el script automáticamente al editar el Sheet
+
+![Triggers configurados](docs/capturas/Dia2/12-triggers-configurados.png)
+
+### 5. Pruebas de funcionamiento
+
+Se realizaron pruebas simulando la adición de nuevas filas al Sheet,
+verificando que el sistema respondió automáticamente en los tres servicios.
+
+#### Sheet actualizado automáticamente
+![Sheet actualizado](docs/capturas/Dia2/09-sheet-actualizado.png)
+
+#### Notificación recibida en Gmail
+![Notificación Gmail](docs/capturas/Dia2/10-gmail-notificacion.png)
+
+#### Evento creado en Google Calendar
+![Evento en Calendar](docs/capturas/Dia2/11-calendar-eventos.png)
+
+#### Prueba con fila nueva — trigger automático
+![Prueba fila nueva](docs/capturas/Dia2/13-prueba-fila-nueva.png)
+![Prueba Gmail](docs/capturas/Dia2/14-prueba-gmail.png)
+![Prueba Calendar](docs/capturas/Dia2/15-prueba-calendar.png)
+
+#### Corrección de bug — alertas duplicadas
+Se identificó y corrigió un bug donde el script enviaba alertas repetidas
+a todas las tareas próximas a vencer en cada ejecución. Se implementó
+una columna de control `Alerta_Enviada` que garantiza una sola notificación
+por tarea.
+
+![Bug corregido](docs/capturas/Dia2/16-prueba-bug-corregido.png)
+![Gmail único correo](docs/capturas/Dia2/17-prueba-gmail-unico.png)
 
 ---
 
@@ -85,6 +155,6 @@ turing-gcp-workspace-prueba/
 │   └── codigo.gs
 └── docs/
     └── capturas/
-        ├── dia1/
-        └── dia2/
+        ├── Dia1/
+        └── Dia2/
 ```
