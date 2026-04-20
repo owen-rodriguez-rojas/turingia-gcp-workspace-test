@@ -5,7 +5,7 @@ Infraestructura GCP con Cloud Storage, Cloud Functions y automatización
 en Google Workspace — Periodo de prueba técnica Turing IA.
 
 ## Arquitectura
-![Diagrama de flujo](docs/capturas/Dia1/diagrama-flujo.png)
+![Diagrama de flujo — integración completa](docs/capturas/Dia3/15_diagrama_arquitectura_dia3.png)
 
 ---
 
@@ -64,6 +64,9 @@ Se implementaron 3 pruebas unitarias verificando el flujo exitoso,
 campos faltantes y manejo de errores.
 
 ![Pruebas unitarias](docs/capturas/Dia1/11-pruebas-unitarias.png)
+
+### Diagrama de flujo — Día 1
+![Diagrama de flujo Día 1](docs/capturas/Dia1/diagrama-flujo.png)
 
 ---
 
@@ -143,6 +146,114 @@ por tarea.
 
 ---
 
+## DÍA 3 — Integración completa, seguridad y despliegue
+
+### Objetivo
+Conectar los servicios de GCP y Google Workspace en un flujo de trabajo
+completo y seguro: desde la subida de un archivo al bucket hasta el registro
+de metadatos en Google Sheets y el envío de una notificación por Gmail.
+
+### 1. Google Sheet — Registro de archivos GCP
+
+Se creó un nuevo Google Sheet con las columnas necesarias para registrar
+los metadatos enviados desde Cloud Storage.
+
+| Columna | Descripción |
+|---|---|
+| `Nombre_Archivo` | Nombre del archivo subido al bucket |
+| `Tamaño_Bytes` | Tamaño en bytes |
+| `Tipo_Contenido` | MIME type del archivo |
+| `Bucket` | Nombre del bucket de origen |
+| `Fecha_Recepcion` | Timestamp de recepción en Apps Script |
+
+![Sheet hoja archivos GCP](docs/capturas/Dia3/01-sheet-hoja-archivos-gcp.png)
+
+### 2. Webhook en Apps Script
+
+Se desarrolló un endpoint HTTP en Google Apps Script (`webhook.gs`) desplegado
+como Web App, que recibe los metadatos enviados por la Cloud Function.
+
+El webhook implementa las siguientes medidas de seguridad y validación:
+
+- Validación de token secreto compartido (`TOKEN_SECRETO`)
+- Verificación de campos obligatorios (`nombre_archivo`, `bucket`)
+- Manejo de errores con respuestas JSON estructuradas
+- Almacenamiento del token en Script Properties (nunca en el código)
+
+![Código webhook](docs/capturas/Dia3/02_apps_script_codigo_webhook.png)
+![Propiedades token](docs/capturas/Dia3/03_apps_script_propiedades_token.png)
+![URL del webhook](docs/capturas/Dia3/04_apps_script_url_webhook.png)
+
+### 3. Actualización de la Cloud Function
+
+Se modificó la Cloud Function del Día 1 para integrarla con el webhook.
+Los cambios principales fueron:
+
+- Lectura de `WEBHOOK_URL` y `TOKEN_SECRETO` desde variables de entorno
+- Construcción del payload con metadatos del archivo
+- Envío del POST al webhook de Apps Script con timeout de 10 segundos
+- Validación del código de respuesta y logging del resultado
+
+![Código Cloud Function integración](docs/capturas/Dia3/05_cloud_function_codigo_integracion.png)
+
+### 4. Variables de entorno en Cloud Run
+
+Se configuraron las variables de entorno necesarias en el servicio de Cloud Run
+que ejecuta la Cloud Function, garantizando que las credenciales no queden
+expuestas en el código fuente.
+
+| Variable | Descripción |
+|---|---|
+| `WEBHOOK_URL` | URL pública del webhook de Apps Script |
+| `TOKEN_SECRETO` | Token de autenticación compartido |
+
+![Variables de entorno Cloud Run](docs/capturas/Dia3/06_cloud_run_variables_entorno.png)
+
+### 5. Corrección del webhook y versionado
+
+Durante las pruebas se detectaron errores en la versión inicial del webhook.
+Se realizaron correcciones y se generaron nuevas versiones del despliegue.
+
+![Webhook corregido](docs/capturas/Dia3/07_codigo_webhook_corregido.png)
+![Versiones deploy](docs/capturas/Dia3/08_versiones_deploy.png)
+
+### 6. Pruebas de integración
+
+Se realizaron pruebas end-to-end subiendo múltiples archivos al bucket y
+verificando el flujo completo en cada servicio.
+
+#### Sheet con datos registrados
+![Sheet datos registrados](docs/capturas/Dia3/09_sheet_datos_registrados.png)
+
+#### Notificación recibida en Gmail
+![Gmail notificación](docs/capturas/Dia3/10_gmail_notificacion_recibida.png)
+
+#### Logs del evento de integración en Cloud Logging
+![Cloud Logging integración](docs/capturas/Dia3/11_cloud_logging_evento_integracion.png)
+
+#### Prueba con múltiples archivos
+![Prueba múltiples archivos](docs/capturas/Dia3/12_prueba_multiples_archivos.png)
+
+#### IAM — Service Account de Cloud Function
+![IAM Service Account](docs/capturas/Dia3/13_iam_service_account.png)
+
+### 7. Incidencia detectada y resuelta
+
+Durante el despliegue se detectó que las variables de entorno `WEBHOOK_URL`
+y `TOKEN_SECRETO` no estaban configuradas en Cloud Run, generando errores
+`POST 500` con el mensaje `Faltan variables de entorno`. Se resolvió
+configurándolas desde la consola de GCP.
+
+![Error variables de entorno](docs/capturas/Dia3/14_error_variables_entorno.png)
+
+### 8. Diagrama de arquitectura
+
+Flujo completo del sistema integrado:
+
+![Diagrama arquitectura Día 3](docs/capturas/Dia3/15_diagrama_arquitectura_dia3.png)
+
+---
+
 ## Estructura del repositorio
 ```
 turing-gcp-workspace-prueba/
@@ -152,9 +263,11 @@ turing-gcp-workspace-prueba/
 │   ├── requirements.txt
 │   └── test_main.py
 ├── workspace-automation/
-│   └── codigo.gs
+│   ├── codigo.gs
+│   └── webhook.gs
 └── docs/
     └── capturas/
         ├── Dia1/
-        └── Dia2/
+        ├── Dia2/
+        └── Dia3/
 ```
