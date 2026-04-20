@@ -239,10 +239,13 @@ verificando el flujo completo en cada servicio.
 
 ### 7. Incidencia detectada y resuelta
 
-Durante el despliegue se detectó que las variables de entorno `WEBHOOK_URL`
-y `TOKEN_SECRETO` no estaban configuradas en Cloud Run, generando errores
-`POST 500` con el mensaje `Faltan variables de entorno`. Se resolvió
-configurándolas desde la consola de GCP.
+Al desplegar la versión actualizada de la Cloud Function por primera vez,
+antes de configurar las variables de entorno en Cloud Run, se detectaron
+errores `POST 500` con el mensaje `Faltan variables de entorno`. El sistema
+no podía conectarse al webhook porque `WEBHOOK_URL` y `TOKEN_SECRETO` aún
+no existían en el entorno de ejecución. Se resolvió agregándolas desde la
+consola de GCP en la configuración del servicio, tras lo cual el flujo
+funcionó correctamente.
 
 ![Error variables de entorno](docs/capturas/Dia3/14_error_variables_entorno.png)
 
